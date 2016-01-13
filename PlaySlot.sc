@@ -34,7 +34,7 @@ PlaySlot {
 		view.mouseDownAction_{ |view|
 			if(isClicked){ isClicked = false }{ isClicked = true };
 			view.background()
-		},
+		};
 
 		buttonView = UserView.new(view, Rect(0, 0, 30, 30)).animate_(true).frameRate_(2);
 
