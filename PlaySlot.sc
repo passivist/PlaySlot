@@ -5,10 +5,13 @@
 *		make everything more general
 *		add prepareToRecord and  recording methods
 *		filled and empty should be seperate entities from the playstates
+*
+*
+*		Grain Synth Density
 */
 
 PlaySlot {
-	var <state, <isFilled, buttonView, view, <mouseDownAction, <row, <column, intermediateBuffer, <buffer, <>synthSlot, <name, nameText, time;
+	var <state, <isFilled, <>isClicked, buttonView, view, <mouseDownAction, <row, <column, intermediateBuffer, <buffer, <>synthSlot, <name, nameText, time;
 
 	*new { arg parent, row=0, column=0;
 		var p = parent.asView;
@@ -28,6 +31,11 @@ PlaySlot {
 		nameText = StaticText.new(view, Rect(30, 5, 90, 20)).string_(name);
 
 		view = UserView.new(parent, Rect(x, y, 110, 30));
+		view.mouseDownAction_{ |view|
+			if(isClicked){ isClicked = false }{ isClicked = true };
+			view.background()
+		},
+
 		buttonView = UserView.new(view, Rect(0, 0, 30, 30)).animate_(true).frameRate_(2);
 
 		this.isFilled_(false);
@@ -207,7 +215,7 @@ PlaySlot {
 	}
 
 	statePrepareToRecord {
-		intermediateBuffer = Buffer.alloc(Server.default, Server.default.sampleRate * 30, 2);
+		intermediateBuffer = Buffer.alloc(Server.default, Server.default.sampleRate * 120, 2);
 
 		buttonView.drawFunc_{ |view|
 			Pen.strokeColor_(Color.black);
