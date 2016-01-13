@@ -2,16 +2,14 @@
 * PlaySlot is a class for managing and drawing Ableton SessionView Style GUIs
 *
 * TODO:
-*		make everything more general
-*		add prepareToRecord and  recording methods
+*		make everything more general-purpose
+*		add overdubbing functionality
 *		filled and empty should be seperate entities from the playstates
 *
-*
-*		Grain Synth Density
 */
 
 PlaySlot {
-	var <state, <isFilled, <>isClicked, buttonView, view, <mouseDownAction, <row, <column, intermediateBuffer, <buffer, <>synthSlot, <name, nameText, time;
+	var <state, <isFilled, <isClicked, buttonView, view, <buttonMouseAction, <cellMouseAction, <row, <column, intermediateBuffer, <buffer, <>synthSlot, <name, nameText, time;
 
 	*new { arg parent, row=0, column=0;
 		var p = parent.asView;
@@ -30,21 +28,32 @@ PlaySlot {
 		name = "";
 		nameText = StaticText.new(view, Rect(30, 5, 90, 20)).string_(name);
 
+		isClicked = false;
 		view = UserView.new(parent, Rect(x, y, 110, 30));
-		view.mouseDownAction_{ |view|
-			if(isClicked){ isClicked = false }{ isClicked = true };
-			view.background()
-		};
 
 		buttonView = UserView.new(view, Rect(0, 0, 30, 30)).animate_(true).frameRate_(2);
 
+		this.isClicked_(false);
 		this.isFilled_(false);
 		this.changeState("stopped");
-
 	}
 
-	mouseDownAction_{ arg aFunction;
-		mouseDownAction = aFunction;
+	isClicked_{|bool|
+		bool.postln;
+		if(bool){
+			view.background_(Color.green(0.5, 0.5));
+		}{
+			view.background_(Color.gray(0.5, 0));
+		}
+	}
+
+	cellMouseAction_{arg aFunction;
+		cellMouseAction = aFunction;
+		view.mouseDownAction = aFunction;
+	}
+
+	buttonMouseAction_{ arg aFunction;
+		buttonMouseAction = aFunction;
 		buttonView.mouseDownAction = aFunction;
 	}
 
