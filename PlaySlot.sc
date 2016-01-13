@@ -28,7 +28,6 @@ PlaySlot {
 		name = "";
 		nameText = StaticText.new(view, Rect(30, 5, 90, 20)).string_(name);
 
-		isClicked = false;
 		view = UserView.new(parent, Rect(x, y, 110, 30));
 
 		buttonView = UserView.new(view, Rect(0, 0, 30, 30)).animate_(true).frameRate_(2);
@@ -38,13 +37,38 @@ PlaySlot {
 		this.changeState("stopped");
 	}
 
+	// deal with this differently maybe redraw the whole cell?
 	isClicked_{|bool|
-		bool.postln;
+		isClicked = bool;
+
 		if(bool){
+			view.keyDownAction_{|view, char, mod, uni, keycode, key|
+				switch(key,
+					// R -> rename HOW???
+					// TextView
+					82, {  },
+					// Del --> check if this is platform independent!
+					16777223, {
+						this.buffer.free;
+						if(synthSlot.notNil){
+							this.synthSlot.free;
+							this.synthSlot = nil;
+						};
+						this.isFilled_(false);
+					}
+				)
+			};
 			view.background_(Color.green(0.5, 0.5));
+			view.refresh;
+			buttonView.refresh;
 		}{
+			view.keyDownAction_(nil);
 			view.background_(Color.gray(0.5, 0));
+			view.refresh;
+			buttonView.refresh;
 		}
+
+
 	}
 
 	cellMouseAction_{arg aFunction;
