@@ -9,7 +9,7 @@
 */
 
 PlaySlot {
-	var <state, <isFilled, <isClicked, buttonView, view, <buttonMouseAction, <cellMouseAction, <row, <column, intermediateBuffer, <buffer, <>synthSlot, <name, nameText, time, <>amp, <>send;
+	var <state, <isFilled, <isClicked, buttonView, view, <buttonMouseAction, <cellMouseAction, <row, <column, intermediateBuffer, <buffer, <>synthSlot, <name, nameText, time, <amp, <send;
 
 	*new { arg parent, row=0, column=0;
 		var p = parent.asView;
@@ -111,6 +111,13 @@ PlaySlot {
 	buffer_ { |buf|
 		buffer = buf;
 		this.isFilled_(true);
+	}
+
+	amp_ {|amp|
+		this.amp = amp;
+		if(synthSlot.notNil){
+			synthSlot.set(\amp, amp)
+		}
 	}
 
 	name_{ |string|
