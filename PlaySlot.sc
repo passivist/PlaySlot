@@ -9,7 +9,7 @@
 */
 
 PlaySlot {
-	var <state, <isFilled, <isClicked, buttonView, view, <buttonMouseAction, <cellMouseAction, <row, <column, intermediateBuffer, <buffer, <>synthSlot, <name, nameText, time;
+	var <state, <isFilled, <isClicked, buttonView, view, <buttonMouseAction, <cellMouseAction, <row, <column, intermediateBuffer, <buffer, <>synthSlot, <name, nameText, time, <>amp, <>send;
 
 	*new { arg parent, row=0, column=0;
 		var p = parent.asView;
@@ -25,6 +25,9 @@ PlaySlot {
 		x = row * 110;
 		y = column * 30;
 
+		amp = 0;
+		send = 0;
+
 		name = "";
 		nameText = StaticText.new(view, Rect(30, 5, 90, 20)).string_(name);
 
@@ -32,8 +35,9 @@ PlaySlot {
 
 		buttonView = UserView.new(view, Rect(0, 0, 30, 30)).animate_(true).frameRate_(2);
 
-		this.isClicked_(false);
 		this.isFilled_(false);
+		this.isClicked_(false);
+
 		this.changeState("stopped");
 	}
 
@@ -58,13 +62,19 @@ PlaySlot {
 					}
 				)
 			};
-			view.background_(Color.green(0.5, 0.5));
+			view.background_(Color.green(1, 0.2));
 			view.refresh;
 			buttonView.refresh;
 		}{
 			view.keyDownAction_(nil);
-			view.background_(Color.gray(0.5, 0));
-			view.refresh;
+
+			if(isFilled){
+				view.background_(Color.gray(0.5, 0));
+			}{
+				view.background_(Color.gray(0.8, 1));
+			};
+
+			view.parent.refresh;
 			buttonView.refresh;
 		}
 
@@ -83,8 +93,7 @@ PlaySlot {
 
 	playSynth {
 		if(buffer.notNil){
-			synthSlot = Synth(\player, [\buf, buffer, \loop, 1]);
-			postf("playSynth: %\n", synthSlot );
+			synthSlot = Synth(\player, [\buf, buffer, \loop, 1, \amp, amp, \send, send]);
 		}
 	}
 
@@ -135,7 +144,11 @@ PlaySlot {
 
 	stateEmpty {
 		view.drawFunc_{
-
+			Pen.color_(Color.black);
+			Pen.width_(1);
+			Pen.smoothing_(false);
+			Pen.addRect(Rect(1, 1, 108, 28));
+			Pen.stroke;
 		};
 
 		buttonView.drawFunc_{ |view|
@@ -147,12 +160,12 @@ PlaySlot {
 	}
 
 	stateFilled {
-		view.background_(Color.gray(0.5));
+		view.background_(Color.gray(0.8, 1));
 		view.drawFunc_{
 			Pen.color_(Color.black);
-			Pen.width_(1);
+			Pen.width_(2);
 			Pen.smoothing_(false);
-			Pen.addRect(Rect(1, 1, 108, 28));
+			Pen.addRect(Rect(2, 2, 107, 27));
 			Pen.stroke;
 		};
 
@@ -315,7 +328,7 @@ RecordButton {
 		row = rowOutside;
 
 		x = (row * 110) + 55;
-		y = 255;
+		y = 245;
 
 		view = UserView.new(parent, Rect(x, y, 55, 30));
 		buttonView = UserView.new(view, Rect(0, 0, 30, 30));
@@ -373,7 +386,7 @@ StopButton {
 		row = rowOutside;
 
 		x = row * 110;
-		y = 255;
+		y = 245;
 
 		view = UserView.new(parent, Rect(x, y, 55, 30));
 		buttonView = UserView.new(view, Rect(27, 0, 30, 30));
