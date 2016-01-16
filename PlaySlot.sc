@@ -9,7 +9,7 @@
 */
 
 PlaySlot {
-	var <state, <isFilled, <isClicked, buttonView, view, <buttonMouseAction, <cellMouseAction, <row, <column, intermediateBuffer, <buffer, <>synthSlot, <name, nameText, time, <amp, <send;
+	var <state, <isFilled, <isClicked, buttonView, view, <buttonMouseAction, <cellMouseAction, <row, <column, intermediateBuffer, <buffer, <>synthSlot, <name, nameText, time, <>bus;
 
 	*new { arg parent, row=0, column=0;
 		var p = parent.asView;
@@ -25,11 +25,10 @@ PlaySlot {
 		x = row * 110;
 		y = column * 30;
 
-		amp = 0;
-		send = 0;
-
 		name = "";
 		nameText = StaticText.new(view, Rect(30, 5, 90, 20)).string_(name);
+
+		bus = 0;
 
 		view = UserView.new(parent, Rect(x, y, 110, 30));
 
@@ -93,7 +92,7 @@ PlaySlot {
 
 	playSynth {
 		if(buffer.notNil){
-			synthSlot = Synth(\player, [\buf, buffer, \loop, 1, \amp, amp, \send, send]);
+			synthSlot = Synth(\player, [\bus, this.bus, \buf, buffer, \loop, 1]);
 		}
 	}
 
@@ -111,13 +110,6 @@ PlaySlot {
 	buffer_ { |buf|
 		buffer = buf;
 		this.isFilled_(true);
-	}
-
-	amp_ {|amp|
-		this.amp = amp;
-		if(synthSlot.notNil){
-			synthSlot.set(\amp, amp)
-		}
 	}
 
 	name_{ |string|
@@ -310,7 +302,7 @@ PlaySlot {
 		var endTime = AppClock.seconds;
 		var length = endTime - time;
 		length.postln;
-		// will this cause timing issues?
+
 		buffer = Buffer.alloc(Server.default, length * Server.default.sampleRate, 2);
 		intermediateBuffer.copyData(buffer, 0, 0, length * Server.default.sampleRate);
 		this.stopSynth;
